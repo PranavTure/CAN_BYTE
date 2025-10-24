@@ -40,7 +40,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "string.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -122,12 +122,7 @@ int main(void)
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
   /* USER CODE END 2 */
-  tx_data = 1;
-  for(int j=0; j<2; j++){
-	  send_data();
-	  HAL_Delay(500);
-  }
-  rx_data = 0;
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -304,16 +299,19 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         // rxData[] = 8 bytes of CAN payload
 
         if(rxHeader.StdId) {
-        	/*
-        	 * rx_data = rxData[0];
-            update_leds(rx_data);
-            tx_data = rx_data << 1;
-            HAL_Delay(10);  // ~5 ms true delay at 80 MHz
 
-        	 */
-        	for(int i=0; i<8; i++) {
+        	/*
+        	 * for(int i=0; i<8; i++) {
         		txData[i] = rxData[i];
         	}
+
+        	send_data();
+        	 */
+
+        	rx_data = rxData[0];
+            update_leds(rx_data);
+            txData[0] = (rx_data << 1);
+
         	send_data();
         }
     }
@@ -338,10 +336,6 @@ void send_data() {
 
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 		}
-		else {
-			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
-		}
-
 	}
 }
 
